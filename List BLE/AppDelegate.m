@@ -32,9 +32,10 @@
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI {
     [self writeToLogFile:
-     [NSString stringWithFormat:@"%@\t%@",
+     [NSString stringWithFormat:@"%@\t%@\t%@",
      peripheral.identifier.UUIDString,
-     peripheral.name
+     peripheral.name,
+     RSSI
      ]
     ];
 
