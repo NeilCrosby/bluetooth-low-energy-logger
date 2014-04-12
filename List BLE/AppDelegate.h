@@ -7,9 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <IOBluetooth/IOBluetooth.h>
+
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
+@property CBCentralManager *myCentralManager;
+@property NSString *logFileLocation;
 
 @end
