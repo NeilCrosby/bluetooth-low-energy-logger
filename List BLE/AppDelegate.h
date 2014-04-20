@@ -15,5 +15,6 @@
 @property (assign) IBOutlet NSWindow *window;
 @property CBCentralManager *myCentralManager;
 @property NSString *logFileLocation;
+@property NSString *logFileDirectory;
 
 @end

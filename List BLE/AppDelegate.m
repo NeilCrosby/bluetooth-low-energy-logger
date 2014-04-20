@@ -17,9 +17,18 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     NSString *filename = [@"bluetooth-low-energy-advertisers" stringByAppendingPathExtension:@"log"];
-    NSString *filepath = [@"~/Library/Logs/" stringByExpandingTildeInPath];
+    self.logFileDirectory = [@"~/Library/Logs/ble-watcher" stringByExpandingTildeInPath];
+
+    NSError * error = nil;
+    [[NSFileManager defaultManager] createDirectoryAtPath:self.logFileDirectory
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:&error];
+    if (error != nil) {
+        NSLog(@"error creating directory: %@", error);
+    }
     
-    self.logFileLocation = [filepath stringByAppendingPathComponent:filename];
+    self.logFileLocation = [self.logFileDirectory stringByAppendingPathComponent:filename];
     
     self.myCentralManager =
     [[CBCentralManager alloc] initWithDelegate:self queue:nil options:nil];
