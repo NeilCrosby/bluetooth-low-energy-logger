@@ -16,8 +16,6 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    self.logFileLocation = @"~/Documents/ble-log.txt";
-    
     NSString *filename = [@"bluetooth-low-energy-advertisers" stringByAppendingPathExtension:@"log"];
     NSString *filepath = [@"~/Library/Logs/" stringByExpandingTildeInPath];
     
