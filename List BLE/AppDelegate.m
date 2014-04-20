@@ -63,12 +63,17 @@
         [@"" writeToFile:self.logFileLocation atomically:NO];
          
     }
-
     
     NSFileHandle *aFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.logFileLocation];
     [aFileHandle truncateFileAtOffset:[aFileHandle seekToEndOfFile]];
     [aFileHandle writeData:[message dataUsingEncoding:NSUTF8StringEncoding]];
     [aFileHandle closeFile];
+    
+    [_arrayController addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                  message, @"log",
+                                  nil
+                                  ]
+     ];
 }
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {

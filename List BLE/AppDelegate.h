@@ -17,4 +17,5 @@
 @property NSString *logFileLocation;
 @property NSString *logFileDirectory;
 
+@property (weak) IBOutlet NSArrayController *arrayController;
 @end
