@@ -38,19 +38,23 @@
  didDiscoverPeripheral:(CBPeripheral *)peripheral
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI {
-    [self writeToLogFile:
-     [NSString stringWithFormat:@"%@\t%@\t%@",
-     peripheral.identifier.UUIDString,
-     peripheral.name,
-     RSSI
-     ]
+    [self manageLogMessage:[NSString stringWithFormat:@"%@\t%@\t%@",
+                                peripheral.identifier.UUIDString,
+                                peripheral.name,
+                                RSSI
+                            ]
+                          :peripheral.identifier.UUIDString
     ];
 
     [self.myCentralManager stopScan];
     [self.myCentralManager scanForPeripheralsWithServices:nil options:nil];
 }
 
-- (void)writeToLogFile:(NSString *)message {
+- (void) manageLogMessage:(NSString *)message {
+    [self manageLogMessage:message :NULL];
+}
+    
+- (void) manageLogMessage:(NSString *)message :(NSString *) bleIdentifier {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd' 'HH':'mm':'ss"];
     NSString *myDateString = [dateFormatter stringFromDate:[[NSDate alloc] init]];
@@ -58,44 +62,55 @@
     message = [NSString stringWithFormat:@"%@\t%@\n", myDateString, message];
     
     NSLog(@"%@", message);
-
-    if (![[NSFileManager defaultManager] fileExistsAtPath:self.logFileLocation]) {
-        [@"" writeToFile:self.logFileLocation atomically:NO];
-         
-    }
-    
-    NSFileHandle *aFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.logFileLocation];
-    [aFileHandle truncateFileAtOffset:[aFileHandle seekToEndOfFile]];
-    [aFileHandle writeData:[message dataUsingEncoding:NSUTF8StringEncoding]];
-    [aFileHandle closeFile];
     
     [_arrayController addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                   message, @"log",
                                   nil
                                   ]
      ];
+    
+    [self writeToLogFile: message :self.logFileLocation];
+    
+    if (bleIdentifier) {
+        NSString *filename = [bleIdentifier stringByAppendingPathExtension:@"log"];
+
+        [self writeToLogFile: message :[self.logFileDirectory stringByAppendingPathComponent:filename]];
+    }
+}
+
+- (void)writeToLogFile:(NSString *)message :(NSString *)filePath {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        [@"" writeToFile:filePath atomically:NO];
+        
+    }
+    
+    NSFileHandle *aFileHandle = [NSFileHandle fileHandleForWritingAtPath:filePath];
+    [aFileHandle truncateFileAtOffset:[aFileHandle seekToEndOfFile]];
+    [aFileHandle writeData:[message dataUsingEncoding:NSUTF8StringEncoding]];
+    [aFileHandle closeFile];
+    
 }
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
     switch (central.state) {
         case CBCentralManagerStatePoweredOff:
-            [self writeToLogFile: @"CoreBluetooth BLE hardware is powered off"];
+            [self manageLogMessage: @"CoreBluetooth BLE hardware is powered off"];
             break;
         case CBCentralManagerStatePoweredOn:
-            [self writeToLogFile: @"CoreBluetooth BLE hardware is powered on and ready"];
+            [self manageLogMessage: @"CoreBluetooth BLE hardware is powered on and ready"];
             [self.myCentralManager scanForPeripheralsWithServices:nil options:nil];
             break;
         case CBCentralManagerStateResetting:
-            [self writeToLogFile: @"CoreBluetooth BLE hardware is resetting"];
+            [self manageLogMessage: @"CoreBluetooth BLE hardware is resetting"];
             break;
         case CBCentralManagerStateUnauthorized:
-            [self writeToLogFile: @"CoreBluetooth BLE state is unauthorized"];
+            [self manageLogMessage: @"CoreBluetooth BLE state is unauthorized"];
             break;
         case CBCentralManagerStateUnknown:
-            [self writeToLogFile: @"CoreBluetooth BLE state is unknown"];
+            [self manageLogMessage: @"CoreBluetooth BLE state is unknown"];
             break;
         case CBCentralManagerStateUnsupported:
-            [self writeToLogFile: @"CoreBluetooth BLE hardware is unsupported on this platform"];
+            [self manageLogMessage: @"CoreBluetooth BLE hardware is unsupported on this platform"];
             break;
         default:
             break;
