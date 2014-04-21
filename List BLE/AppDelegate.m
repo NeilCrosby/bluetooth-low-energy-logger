@@ -75,6 +75,12 @@
         NSString *filename = [bleIdentifier stringByAppendingPathExtension:@"log"];
 
         [self writeToLogFile: message :[self.logFileDirectory stringByAppendingPathComponent:filename]];
+        
+        NSTask *task = [[NSTask alloc] init];
+        [task setLaunchPath:@"/bin/sh"];
+        [task setArguments:[NSArray arrayWithObjects:[[NSBundle mainBundle]
+                                                      pathForResource:@"connect-to-indigo" ofType:@"sh"], bleIdentifier, nil]];
+        [task launch];
     }
 }
 

@@ -1,0 +1,11 @@
+try:
+    newVar = indigo.variable.create("VAR-NAME", "default value")
+except ValueError, e:
+	if e.message == "NameNotUniqueError":
+        newVar = indigo.variables["VAR-NAME"]
+	else:
+        indigo.server.log(e.message)
+        exit()
+        
+indigo.variable.updateValue(newVar, indigo.server.getTime().strftime("%Y-%m-%d %H:%M:%S"))
+
